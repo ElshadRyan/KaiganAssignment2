@@ -1,9 +1,24 @@
-using System.Linq;
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
+public class BodyToEnabled
+{
+    public List<bool> partsToEnabled = new List<bool>();
+}
 public class ChangingSkins : MonoBehaviour
 {
     public static ChangingSkins instance;
+
+    [Header("Female Body Parts To Enabled")]
+    public List<BodyToEnabled> F_topBody;
+    public List<BodyToEnabled> F_bottomBody;
+
+    [Header("Male Body Parts To Enabled")]
+    public List<BodyToEnabled> M_topBody;
+    public List<BodyToEnabled> M_bottomBody;
 
     [Header("Female Skins")] 
     public SkinnedMeshRenderer[] F_Top_prefabSkinnedMeshRenderers;
@@ -40,22 +55,22 @@ public class ChangingSkins : MonoBehaviour
                 break;
         }
     }
-    public virtual void ChangingSkin(Transform rootBone, SkinnedMeshRenderer currSkinnedMeshRenderers, _CharID ID, _skinCategories skinCategories)
+    public virtual void ChangingSkin(Transform rootBone, ref SkinnedMeshRenderer currSkinnedMeshRenderers, _CharID ID, _skinCategories skinCategories, GameObject[] topBody, GameObject[] bottomBody)
     {
         switch(skinCategories)
         {
             
             case _skinCategories.top:
-                ChangingTop(rootBone, currSkinnedMeshRenderers, ID, false);
+                ChangingTop(rootBone, ref currSkinnedMeshRenderers, ID, false, topBody);
                 break;
             case _skinCategories.bottom:
-                ChangingBottom(rootBone, currSkinnedMeshRenderers, ID, false);
+                ChangingBottom(rootBone, ref currSkinnedMeshRenderers, ID, false, bottomBody);
                 break;
             case _skinCategories.shoes:
-                ChangingShoes(rootBone, currSkinnedMeshRenderers, ID, false);
+                ChangingShoes(rootBone, ref currSkinnedMeshRenderers, ID, false);
                 break;
             case _skinCategories.top_accesories:
-                ChangingTopAccesories(rootBone, currSkinnedMeshRenderers, ID, false);
+                ChangingTopAccesories(rootBone, ref currSkinnedMeshRenderers, ID, false);
                 break;
             case _skinCategories.preset:
                 ChangingOutfitPreset();
@@ -64,27 +79,39 @@ public class ChangingSkins : MonoBehaviour
         }
     }
 
-    public virtual void ChangingTop(Transform rootBone, SkinnedMeshRenderer currSkin, _CharID ID, bool random)
+    
+    
+    public virtual void ChangingTop(Transform rootBone, ref SkinnedMeshRenderer currSkin, _CharID ID, bool random, GameObject[] topBody)
     {
         SkinnedMeshRenderer tempSkin;
+        SkinnedMeshRenderer original;
+        int indexNum;
         if (!random)
         {
             if (ID == _CharID.female)
             {
-                tempSkin = Instantiate(Changing(currSkin, F_Top_prefabSkinnedMeshRenderers), currSkin.transform.parent);
+                
+                tempSkin = Instantiate(Changing(currSkin, F_Top_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
                 tempSkin.bones = currSkin.bones;
                 tempSkin.rootBone = rootBone;
+                original = F_Top_prefabSkinnedMeshRenderers[indexNum];
 
                 Destroy(currSkin.gameObject);
+                currSkin = original;
+                //EnablingBodyParts(topBody, CheckWhatIndex(currSkin, F_Top_prefabSkinnedMeshRenderers));
 
             }
             else
             {
-                tempSkin = Instantiate(Changing(currSkin, M_Top_prefabSkinnedMeshRenderers), currSkin.transform.parent);
+                tempSkin = Instantiate(Changing(currSkin, M_Top_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
                 tempSkin.bones = currSkin.bones;
                 tempSkin.rootBone = rootBone;
+                original = F_Top_prefabSkinnedMeshRenderers[indexNum];
 
                 Destroy(currSkin.gameObject);
+                currSkin = original;
+                //EnablingBodyParts(topBody, CheckWhatIndex(currSkin, M_Top_prefabSkinnedMeshRenderers));
+
 
             }
         }
@@ -92,20 +119,24 @@ public class ChangingSkins : MonoBehaviour
         {
             if (ID == _CharID.female)
             {
-                tempSkin = Instantiate(ChangingRandom(currSkin, F_Top_prefabSkinnedMeshRenderers), currSkin.transform.parent);
+                tempSkin = Instantiate(ChangingRandom(currSkin, F_Top_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
                 tempSkin.bones = currSkin.bones;
                 tempSkin.rootBone = rootBone;
+                //EnablingBodyParts(topBody, CheckWhatIndex(currSkin, F_Top_prefabSkinnedMeshRenderers));
 
                 Destroy(currSkin.gameObject);
+                currSkin = M_Top_prefabSkinnedMeshRenderers[indexNum];
 
             }
             else
             {
-                tempSkin = Instantiate(Changing(currSkin, M_Top_prefabSkinnedMeshRenderers), currSkin.transform.parent);
+                tempSkin = Instantiate(ChangingRandom(currSkin, M_Top_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
                 tempSkin.bones = currSkin.bones;
                 tempSkin.rootBone = rootBone;
+                //EnablingBodyParts(topBody, CheckWhatIndex(currSkin, M_Top_prefabSkinnedMeshRenderers));
 
                 Destroy(currSkin.gameObject);
+                currSkin = M_Top_prefabSkinnedMeshRenderers[indexNum];
 
             }
 
@@ -114,27 +145,33 @@ public class ChangingSkins : MonoBehaviour
 
     }
 
-    public virtual void ChangingBottom(Transform rootBone, SkinnedMeshRenderer currSkin, _CharID ID, bool random)
+    public virtual void ChangingBottom(Transform rootBone, ref SkinnedMeshRenderer currSkin, _CharID ID, bool random, GameObject[] bottomBody)
     {
         SkinnedMeshRenderer tempSkin;
+        int indexNum;
         if (!random)
         {
             if (ID == _CharID.female)
             {
-                tempSkin = Instantiate(Changing(currSkin, F_Bot_prefabSkinnedMeshRenderers), currSkin.transform.parent);
+                tempSkin = Instantiate(Changing(currSkin, F_Bot_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
                 tempSkin.bones = currSkin.bones;
                 tempSkin.rootBone = rootBone;
 
                 Destroy(currSkin.gameObject);
+                currSkin = F_Bot_prefabSkinnedMeshRenderers[indexNum];
+                //EnablingBodyParts(bottomBody, CheckWhatIndex(currSkin, F_Bot_prefabSkinnedMeshRenderers));
+
 
             }
             else
             {
-                tempSkin = Instantiate(Changing(currSkin, M_Bot_prefabSkinnedMeshRenderers), currSkin.transform.parent);
+                tempSkin = Instantiate(Changing(currSkin, M_Bot_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
                 tempSkin.bones = currSkin.bones;
                 tempSkin.rootBone = rootBone;
 
                 Destroy(currSkin.gameObject);
+                currSkin = M_Bot_prefabSkinnedMeshRenderers[indexNum];
+                //EnablingBodyParts(bottomBody, CheckWhatIndex(currSkin, M_Bot_prefabSkinnedMeshRenderers));
 
             }
         }
@@ -142,94 +179,52 @@ public class ChangingSkins : MonoBehaviour
         {
             if (ID == _CharID.female)
             {
-                tempSkin = Instantiate(ChangingRandom(currSkin, F_Bot_prefabSkinnedMeshRenderers), currSkin.transform.parent);
+                tempSkin = Instantiate(ChangingRandom(currSkin, F_Bot_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
                 tempSkin.bones = currSkin.bones;
                 tempSkin.rootBone = rootBone;
 
                 Destroy(currSkin.gameObject);
+                currSkin = M_Bot_prefabSkinnedMeshRenderers[indexNum];
 
             }
             else
             {
-                tempSkin = Instantiate(Changing(currSkin, M_Bot_prefabSkinnedMeshRenderers), currSkin.transform.parent);
+                tempSkin = Instantiate(ChangingRandom(currSkin, M_Bot_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
                 tempSkin.bones = currSkin.bones;
                 tempSkin.rootBone = rootBone;
 
                 Destroy(currSkin.gameObject);
-            }
-
-        }
-    }
-
-    public virtual void ChangingShoes(Transform rootBone, SkinnedMeshRenderer currSkin, _CharID ID, bool random)
-    {
-        SkinnedMeshRenderer tempSkin;
-        if (!random)
-        {
-            if (ID == _CharID.female)
-            {
-                tempSkin = Instantiate(Changing(currSkin, F_Shoes_prefabSkinnedMeshRenderers), currSkin.transform.parent);
-                tempSkin.bones = currSkin.bones;
-                tempSkin.rootBone = rootBone;
-
-                Destroy(currSkin.gameObject);
-
-            }
-            else
-            {
-                tempSkin = Instantiate(Changing(currSkin, M_Shoes_prefabSkinnedMeshRenderers), currSkin.transform.parent);
-                tempSkin.bones = currSkin.bones;
-                tempSkin.rootBone = rootBone;
-
-                Destroy(currSkin.gameObject);
-
-            }
-        }
-        else
-        {
-            if (ID == _CharID.female)
-            {
-                tempSkin = Instantiate(ChangingRandom(currSkin, F_Shoes_prefabSkinnedMeshRenderers), currSkin.transform.parent);
-                tempSkin.bones = currSkin.bones;
-                tempSkin.rootBone = rootBone;
-
-                Destroy(currSkin.gameObject);
-
-            }
-            else
-            {
-                tempSkin = Instantiate(Changing(currSkin, M_Shoes_prefabSkinnedMeshRenderers), currSkin.transform.parent);
-                tempSkin.bones = currSkin.bones;
-                tempSkin.rootBone = rootBone;
-
-                Destroy(currSkin.gameObject);
+                currSkin = M_Bot_prefabSkinnedMeshRenderers[indexNum];
 
             }
 
         }
     }
 
-    public virtual void ChangingTopAccesories(Transform rootBone, SkinnedMeshRenderer currSkin, _CharID ID, bool random)
+    public virtual void ChangingShoes(Transform rootBone, ref SkinnedMeshRenderer currSkin, _CharID ID, bool random)
     {
         SkinnedMeshRenderer tempSkin;
+        int indexNum;
         if (!random)
         {
             if (ID == _CharID.female)
             {
-                tempSkin = Instantiate(Changing(currSkin, F_TopAccesorry_prefabSkinnedMeshRenderers), currSkin.transform.parent);
+                tempSkin = Instantiate(Changing(currSkin, F_Shoes_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
                 tempSkin.bones = currSkin.bones;
                 tempSkin.rootBone = rootBone;
 
                 Destroy(currSkin.gameObject);
+                currSkin = F_Shoes_prefabSkinnedMeshRenderers[indexNum];
 
             }
             else
             {
-                tempSkin = Instantiate(Changing(currSkin, M_TopAccesorry_prefabSkinnedMeshRenderers), currSkin.transform.parent);
+                tempSkin = Instantiate(Changing(currSkin, M_Shoes_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
                 tempSkin.bones = currSkin.bones;
                 tempSkin.rootBone = rootBone;
 
                 Destroy(currSkin.gameObject);
+                currSkin = M_Shoes_prefabSkinnedMeshRenderers[indexNum];
 
             }
         }
@@ -237,20 +232,75 @@ public class ChangingSkins : MonoBehaviour
         {
             if (ID == _CharID.female)
             {
-                tempSkin = Instantiate(ChangingRandom(currSkin, F_TopAccesorry_prefabSkinnedMeshRenderers), currSkin.transform.parent);
+                tempSkin = Instantiate(ChangingRandom(currSkin, F_Shoes_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
                 tempSkin.bones = currSkin.bones;
                 tempSkin.rootBone = rootBone;
 
                 Destroy(currSkin.gameObject);
+                currSkin = F_Shoes_prefabSkinnedMeshRenderers[indexNum];
 
             }
             else
             {
-                tempSkin = Instantiate(Changing(currSkin, M_TopAccesorry_prefabSkinnedMeshRenderers), currSkin.transform.parent);
+                tempSkin = Instantiate(ChangingRandom(currSkin, M_Shoes_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
                 tempSkin.bones = currSkin.bones;
                 tempSkin.rootBone = rootBone;
 
                 Destroy(currSkin.gameObject);
+                currSkin = M_Shoes_prefabSkinnedMeshRenderers[indexNum];
+
+            }
+
+        }
+    }
+
+    public virtual void ChangingTopAccesories(Transform rootBone, ref SkinnedMeshRenderer currSkin, _CharID ID, bool random)
+    {
+        SkinnedMeshRenderer tempSkin;
+        int indexNum;
+        if (!random)
+        {
+            if (ID == _CharID.female)
+            {
+                tempSkin = Instantiate(Changing(currSkin, F_TopAccesorry_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
+                tempSkin.bones = currSkin.bones;
+                tempSkin.rootBone = rootBone;
+
+                Destroy(currSkin.gameObject);
+                currSkin = F_TopAccesorry_prefabSkinnedMeshRenderers[indexNum];
+
+            }
+            else
+            {
+                tempSkin = Instantiate(Changing(currSkin, M_TopAccesorry_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
+                tempSkin.bones = currSkin.bones;
+                tempSkin.rootBone = rootBone;
+
+                Destroy(currSkin.gameObject);
+                currSkin = M_TopAccesorry_prefabSkinnedMeshRenderers[indexNum];
+
+            }
+        }
+        else
+        {
+            if (ID == _CharID.female)
+            {
+                tempSkin = Instantiate(ChangingRandom(currSkin, F_TopAccesorry_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
+                tempSkin.bones = currSkin.bones;
+                tempSkin.rootBone = rootBone;
+
+                Destroy(currSkin.gameObject);
+                currSkin = F_TopAccesorry_prefabSkinnedMeshRenderers[indexNum];
+
+            }
+            else
+            {
+                tempSkin = Instantiate(ChangingRandom(currSkin, M_TopAccesorry_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
+                tempSkin.bones = currSkin.bones;
+                tempSkin.rootBone = rootBone;
+
+                Destroy(currSkin.gameObject);
+                currSkin = M_TopAccesorry_prefabSkinnedMeshRenderers[indexNum];
 
             }
 
@@ -308,12 +358,12 @@ public class ChangingSkins : MonoBehaviour
         {
             if (ID == _CharID.female)
             {
-                hair = F_Head_prefab[Random.Range(0, F_Head_prefab.Length-1)];
+                hair = F_Head_prefab[UnityEngine.Random.Range(0, F_Head_prefab.Length-1)];
                 Instantiate(hair, slot);
             }
             else
             {
-                hair = M_Head_prefab[Random.Range(0, M_Head_prefab.Length-1)];
+                hair = M_Head_prefab[UnityEngine.Random.Range(0, M_Head_prefab.Length-1)];
                 Instantiate(hair, slot);
             }
         }
@@ -359,21 +409,26 @@ public class ChangingSkins : MonoBehaviour
         return -1;
     }
 
-    public virtual SkinnedMeshRenderer ChangingRandom(SkinnedMeshRenderer currSkin, SkinnedMeshRenderer[] list)
+    public virtual SkinnedMeshRenderer ChangingRandom(SkinnedMeshRenderer currSkin, SkinnedMeshRenderer[] list, out int num)
     {
+        
         int idx;
-        idx = Random.Range(0, list.Length);
+        idx = UnityEngine.Random.Range(0, list.Length);
+
+        num = idx;
 
         return list[idx];
     }
 
-    public virtual SkinnedMeshRenderer Changing(SkinnedMeshRenderer currSkin, SkinnedMeshRenderer[] list)
+    public virtual SkinnedMeshRenderer Changing(SkinnedMeshRenderer currSkin, SkinnedMeshRenderer[] list, out int num)
     {
         int idx;
         idx = CheckWhatIndex(currSkin, list);
 
         idx++;
         idx = idx % list.Length;
+
+        num = idx;
 
         return list[idx];
     }
@@ -388,5 +443,14 @@ public class ChangingSkins : MonoBehaviour
         idx = idx % list.Length;
 
         return list[idx];
+    }
+
+    public virtual void EnablingBodyParts(GameObject[] bodyParts, int idx)
+    {
+
+        for (int i = 0; i < bodyParts.Length; i++)
+        {
+            bodyParts[i].gameObject.SetActive(F_topBody[idx].partsToEnabled[i]);
+        }
     }
 }
