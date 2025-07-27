@@ -127,13 +127,13 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 538344865}
     m_Modifications:
-    - target: {fileID: 1218439109, guid: 752274b57d5eef247891bfbd2bf436f5, type: 3}
+    - target: {fileID: 1251800655, guid: 752274b57d5eef247891bfbd2bf436f5, type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1286501401, guid: 752274b57d5eef247891bfbd2bf436f5, type: 3}
+    - target: {fileID: 1622394073, guid: 752274b57d5eef247891bfbd2bf436f5, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 956291484318077496, guid: 752274b57d5eef247891bfbd2bf436f5, type: 3}
       propertyPath: m_LocalPosition.x
@@ -568,10 +568,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 264068795}
     m_Modifications:
-    - target: {fileID: 596423041, guid: 9b36da4f8e47ed247817fcf980805998, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 3157075755909196197, guid: 9b36da4f8e47ed247817fcf980805998, type: 3}
       propertyPath: m_Name
       value: F_FullBody AllEquipments
@@ -655,9 +651,134 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f6450fc71da2984fafec446feec76ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  F_prefabSkinnedMeshRenderers: []
-  M_prefabSkinnedMeshRenderers: []
-  rootBone: {fileID: 0}
+  F_Top_prefabSkinnedMeshRenderers:
+  - {fileID: 6752633421586961133, guid: 75fd98ea9113b2b4295ebf44a0cac0e7, type: 3}
+  - {fileID: 8051319069743126680, guid: a435a52c23fdee04baff522c5833095d, type: 3}
+  - {fileID: 7796616781219010423, guid: c5bd38007d7982845aa77556a4715cce, type: 3}
+  - {fileID: 6436857281552658611, guid: 7594d143f7fd968498c47be05c48d5ae, type: 3}
+  - {fileID: 4913988263544607731, guid: 46a1072c44ec3634b991088f7a98b051, type: 3}
+  - {fileID: 1014973022505469601, guid: 44d7c7a1c3cefc14aa63e8626980b521, type: 3}
+  - {fileID: 1748594073157222860, guid: e59c9cad00ea22e4184c7f9bcc624ce1, type: 3}
+  - {fileID: 7520761835122152075, guid: 036bf58c7b0c54949a57e39ff6788661, type: 3}
+  - {fileID: 5662927493127810251, guid: aced78cefe68d0441b28a8956028b112, type: 3}
+  - {fileID: 6734767354962363765, guid: dae333dcb17643f47a0cc8be0da7d87b, type: 3}
+  - {fileID: 6148605449276211430, guid: 304dd69c53b5cb640875920a596351d2, type: 3}
+  F_Bot_prefabSkinnedMeshRenderers:
+  - {fileID: 443527573434208718, guid: 728ff048ce96dd749992c484f66fa5e4, type: 3}
+  - {fileID: 7554140364365283921, guid: b14dcd77805d09c4e8f3db6e6d986684, type: 3}
+  - {fileID: 3541939883805255747, guid: ef722ef8d720a3548b795e9aacdb08bd, type: 3}
+  - {fileID: 168277279209441451, guid: 98a8c409de419f24380f30cda33ad640, type: 3}
+  - {fileID: 5747891494422071489, guid: d8df83a3d6e9e2f4681522e7083430d7, type: 3}
+  F_Shoes_prefabSkinnedMeshRenderers:
+  - {fileID: 1459639295570537773, guid: ac0e2baf1779d1e45be9a69cde06af6f, type: 3}
+  - {fileID: 690718206716065917, guid: ea406c3121dc8ed40a02c4bf7dadeae8, type: 3}
+  - {fileID: 354344356891093856, guid: db1637b34c73a804791f8e80d7bbc593, type: 3}
+  - {fileID: 5713644955665713467, guid: 3135098072e0d7b4d816875a7d2e30bb, type: 3}
+  - {fileID: 1546535708688970660, guid: 23ca05a0c83625c4d8a44f2aba51c1ff, type: 3}
+  - {fileID: 8749228795849686288, guid: bee43cf8f3dbbfd45943ac8da51af668, type: 3}
+  - {fileID: 5927432059844394658, guid: 264841897f1797e45b7c1c1707387f4a, type: 3}
+  F_TopAccesorry_prefabSkinnedMeshRenderers:
+  - {fileID: 4710832876386499792, guid: 113b91ee964f817439e173ffc48d8e7e, type: 3}
+  - {fileID: 1572139202463687647, guid: e9efdfa9396180f48907318cd990be51, type: 3}
+  - {fileID: 6959650789975696322, guid: 1b6667f4d350bb24c86059fcd6400661, type: 3}
+  F_Preset_prefabSkinnedMeshRenderers:
+  - {fileID: 6034454501759957985, guid: 31c428b4ed343d849be77af48533916f, type: 3}
+  - {fileID: 6499262911607954316, guid: 72edd7299b126d4459aedf4c01f332d8, type: 3}
+  - {fileID: 3828114359401187430, guid: ae727b9fefd49ec4aaba32b2e69b2ad6, type: 3}
+  - {fileID: 3302881469774189205, guid: 22d52e825606759498694ab83e651799, type: 3}
+  F_HeadAccesorry_prefabSkinnedMeshRenderers:
+  - {fileID: 9119345942327377244, guid: 096c27d35824c1449a7405e306c00444, type: 3}
+  - {fileID: 4876037951994480605, guid: 07d4c6e881ed440428b0d68a2e7a2168, type: 3}
+  F_Head_prefabSkinnedMeshRenderers:
+  - {fileID: 7241678832772198468, guid: a1f4ef475d6dced4a8e613f7e5476eb8, type: 3}
+  - {fileID: 3662406358619881683, guid: aaa0575c6f778194fa29a8cdf6d2d660, type: 3}
+  - {fileID: 9020585589484151328, guid: e833763c49c59c84ca99d7d829fd0c4d, type: 3}
+  - {fileID: 7478209522975825686, guid: 20f17f4a0c9171243b066fda72aafe22, type: 3}
+  - {fileID: 5995088057305019357, guid: 6a91d2acd82a4524aae1a462b170c225, type: 3}
+  - {fileID: 5078743730133331100, guid: 632d7d1c0f2465645bb5de991ac8d8a5, type: 3}
+  - {fileID: 6522595923731680872, guid: 45a59bbfaf6d6bc4895e61318f8c653f, type: 3}
+  - {fileID: 1965951839051624730, guid: 9d1f6df9de12c4f47a49d40a2e998054, type: 3}
+  - {fileID: 6764984390278409720, guid: dcd6563117971e84dafad86833b06deb, type: 3}
+  - {fileID: 4708039198183414347, guid: 5201f82a70ccb9746bed706ef4b365d8, type: 3}
+  - {fileID: 1599321886454613934, guid: 6c4696e87f93cc646bab17b56f332a89, type: 3}
+  - {fileID: 6714915336185374290, guid: 6fb252f537bc4314c80c589f69ab1b87, type: 3}
+  - {fileID: 6507985917740031451, guid: a805e5ca45924ac40834c5f1edd784c2, type: 3}
+  - {fileID: 1722147766487801031, guid: 5bee1f2ef12711c4083fdaaaee52faa2, type: 3}
+  - {fileID: 4566865648922079563, guid: 8bbcd53d27dce594bb27d9d5be7bfd96, type: 3}
+  - {fileID: 4797925216500254666, guid: df9a9bab92579ca4fb62cc1148424e05, type: 3}
+  - {fileID: 3834789752565888624, guid: 8fa16b650ba3ac74688272a6c700845d, type: 3}
+  - {fileID: 3548804436267661087, guid: 9915f14c793bb0b4ea63c02389687b33, type: 3}
+  - {fileID: 1226429685222261466, guid: ea133560837a9c7468be5682094bd462, type: 3}
+  - {fileID: 7305556830056221798, guid: 412ed30265d285b44a2178fdc37d7e13, type: 3}
+  - {fileID: 35932227852246825, guid: 11a1124d3b23a1f4f96a733d49262a97, type: 3}
+  - {fileID: 6132911122072038694, guid: ad05d9da1976b434ba3fbe4cc523b4a8, type: 3}
+  - {fileID: 6281058544784308924, guid: 5954b33934a05b14bba4c74b006071b8, type: 3}
+  - {fileID: 8342447201817581223, guid: 7568702397756b34ca126243b8f92859, type: 3}
+  - {fileID: 3878837682084589866, guid: fcfaf8bae48fe1c4e9abcf7b4dc6d8a6, type: 3}
+  - {fileID: 7353256068055730447, guid: eab7856d64fbc634bb9edd64e21194ea, type: 3}
+  - {fileID: 6736858617362117364, guid: 1e171e5c6dbddc84fa2dc0b3b9cb87ce, type: 3}
+  - {fileID: 8820388434841840572, guid: 36a492e9cd1cc234bb8eb1865b26641b, type: 3}
+  - {fileID: 142549506190054274, guid: ca71ea1375c97584ab2e5271570a6ca7, type: 3}
+  - {fileID: 983731601397045570, guid: a3cda2b4d005a284f9a13ffc991d47d8, type: 3}
+  - {fileID: 4912725203346357234, guid: c5c3c73092c85aa4d9ee85892580954f, type: 3}
+  - {fileID: 5602655001372632041, guid: a9f3e7f64778ce94eb807e9e42223c2b, type: 3}
+  - {fileID: 527804738595469006, guid: ad91fd69f2362d14bb002c70efbead35, type: 3}
+  - {fileID: 2508792684523485923, guid: cc83e4f2c4c64c94083ef2363f98e32b, type: 3}
+  - {fileID: 7635575811675592412, guid: 5566124a7947c104291586bac7ac6b73, type: 3}
+  - {fileID: 5116799755048112001, guid: e73808cfcab935740b7127fa5598d957, type: 3}
+  - {fileID: 3897669597225961932, guid: 611911455b2b691449cbe9848f439464, type: 3}
+  - {fileID: 7210877508454545425, guid: 1b8508ea92d42dd40b4f5e98b7bfab21, type: 3}
+  M_Top_prefabSkinnedMeshRenderers:
+  - {fileID: 6752633421586961133, guid: 75fd98ea9113b2b4295ebf44a0cac0e7, type: 3}
+  - {fileID: 8051319069743126680, guid: a435a52c23fdee04baff522c5833095d, type: 3}
+  - {fileID: 7796616781219010423, guid: c5bd38007d7982845aa77556a4715cce, type: 3}
+  - {fileID: 6436857281552658611, guid: 7594d143f7fd968498c47be05c48d5ae, type: 3}
+  - {fileID: 4913988263544607731, guid: 46a1072c44ec3634b991088f7a98b051, type: 3}
+  - {fileID: 1014973022505469601, guid: 44d7c7a1c3cefc14aa63e8626980b521, type: 3}
+  - {fileID: 1791069975656782652, guid: f78eb8cf9d71bcb4a8492608bfb13b46, type: 3}
+  - {fileID: 7520761835122152075, guid: 036bf58c7b0c54949a57e39ff6788661, type: 3}
+  - {fileID: 5662927493127810251, guid: aced78cefe68d0441b28a8956028b112, type: 3}
+  - {fileID: 6734767354962363765, guid: dae333dcb17643f47a0cc8be0da7d87b, type: 3}
+  - {fileID: 6148605449276211430, guid: 304dd69c53b5cb640875920a596351d2, type: 3}
+  M_Bot_prefabSkinnedMeshRenderers:
+  - {fileID: 443527573434208718, guid: 728ff048ce96dd749992c484f66fa5e4, type: 3}
+  - {fileID: 7554140364365283921, guid: b14dcd77805d09c4e8f3db6e6d986684, type: 3}
+  - {fileID: 7534111985844606899, guid: 6a39c3fad9c58da49995adc24838fa18, type: 3}
+  - {fileID: 3541939883805255747, guid: ef722ef8d720a3548b795e9aacdb08bd, type: 3}
+  - {fileID: 168277279209441451, guid: 98a8c409de419f24380f30cda33ad640, type: 3}
+  - {fileID: 5747891494422071489, guid: d8df83a3d6e9e2f4681522e7083430d7, type: 3}
+  M_Shoes_prefabSkinnedMeshRenderers:
+  - {fileID: 1459639295570537773, guid: ac0e2baf1779d1e45be9a69cde06af6f, type: 3}
+  - {fileID: 690718206716065917, guid: ea406c3121dc8ed40a02c4bf7dadeae8, type: 3}
+  - {fileID: 354344356891093856, guid: db1637b34c73a804791f8e80d7bbc593, type: 3}
+  - {fileID: 5713644955665713467, guid: 3135098072e0d7b4d816875a7d2e30bb, type: 3}
+  - {fileID: 1546535708688970660, guid: 23ca05a0c83625c4d8a44f2aba51c1ff, type: 3}
+  - {fileID: 8749228795849686288, guid: bee43cf8f3dbbfd45943ac8da51af668, type: 3}
+  - {fileID: 5927432059844394658, guid: 264841897f1797e45b7c1c1707387f4a, type: 3}
+  M_TopAccesorry_prefabSkinnedMeshRenderers:
+  - {fileID: 4710832876386499792, guid: 113b91ee964f817439e173ffc48d8e7e, type: 3}
+  - {fileID: 1572139202463687647, guid: e9efdfa9396180f48907318cd990be51, type: 3}
+  - {fileID: 6959650789975696322, guid: 1b6667f4d350bb24c86059fcd6400661, type: 3}
+  M_Preset_prefabSkinnedMeshRenderers:
+  - {fileID: 6034454501759957985, guid: 31c428b4ed343d849be77af48533916f, type: 3}
+  - {fileID: 6499262911607954316, guid: 72edd7299b126d4459aedf4c01f332d8, type: 3}
+  - {fileID: 3302881469774189205, guid: 22d52e825606759498694ab83e651799, type: 3}
+  M_HeadAccesorry_prefabSkinnedMeshRenderers:
+  - {fileID: 9119345942327377244, guid: 096c27d35824c1449a7405e306c00444, type: 3}
+  - {fileID: 4876037951994480605, guid: 07d4c6e881ed440428b0d68a2e7a2168, type: 3}
+  M_Head_prefabSkinnedMeshRenderers:
+  - {fileID: 7241678832772198468, guid: a1f4ef475d6dced4a8e613f7e5476eb8, type: 3}
+  - {fileID: 3662406358619881683, guid: aaa0575c6f778194fa29a8cdf6d2d660, type: 3}
+  - {fileID: 1398059577341380902, guid: d20df99f819391b4cb82b98fb1c0a751, type: 3}
+  - {fileID: 3834789752565888624, guid: 8fa16b650ba3ac74688272a6c700845d, type: 3}
+  - {fileID: 5986377285347600169, guid: 852fcece5c953864e989abe7739fb26f, type: 3}
+  - {fileID: 7557105645905069180, guid: 6a3ca631b618d8241a275c7403139ea8, type: 3}
+  - {fileID: 5818141721773630617, guid: 80ef01842f9c0954998d821578021a59, type: 3}
+  - {fileID: 6569430983206793253, guid: 96ca0666e0e13444ca5e7d7a6e5556fa, type: 3}
+  - {fileID: 5602655001372632041, guid: a9f3e7f64778ce94eb807e9e42223c2b, type: 3}
+  - {fileID: 6992893729710466335, guid: e6dd1109a81cd2142af681e8f45625d4, type: 3}
+  - {fileID: 5116799755048112001, guid: e73808cfcab935740b7127fa5598d957, type: 3}
+  - {fileID: 7210877508454545425, guid: 1b8508ea92d42dd40b4f5e98b7bfab21, type: 3}
 --- !u!4 &1928313846
 Transform:
   m_ObjectHideFlags: 0
