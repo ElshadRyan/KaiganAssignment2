@@ -11,14 +11,21 @@ public class BodyToEnabled
 public class ChangingSkins : MonoBehaviour
 {
     public static ChangingSkins instance;
+    private GameManager GM;
 
     [Header("Female Body Parts To Enabled")]
     public List<BodyToEnabled> F_topBody;
     public List<BodyToEnabled> F_bottomBody;
+    public List<BodyToEnabled> F_presetTopBody;
+    public List<BodyToEnabled> F_presetBottomBody;
+    public List<BodyToEnabled> F_hair;
 
     [Header("Male Body Parts To Enabled")]
     public List<BodyToEnabled> M_topBody;
     public List<BodyToEnabled> M_bottomBody;
+    public List<BodyToEnabled> M_presetTopBody;
+    public List<BodyToEnabled> M_presetBottomBody;
+    public List<BodyToEnabled> M_hair;
 
     [Header("Female Skins")] 
     public SkinnedMeshRenderer[] F_Top_prefabSkinnedMeshRenderers;
@@ -43,337 +50,458 @@ public class ChangingSkins : MonoBehaviour
         instance = this;
     }
 
-    public virtual void ChangingSkin(Transform slot, _CharID ID, _skinCategories skinCategories)
+    private void Start()
+    {
+        GM = GameManager.instance;
+    }
+
+    // handles changing skins that use prefab gameObject
+    //it required original game object(prefab), copy game object(instantiate), head slot (to put the skins), gender, skin category to change
+    public virtual void ChangingSkin(ref GameObject O_currObj, ref GameObject C_currOBJ, Transform slot, _CharID ID, _skinCategories skinCategories)
     {
         switch (skinCategories)
         {
             case _skinCategories.head:
-                ChangingHair(slot, ID);
+                ChangingHair(ref O_currObj, ref C_currOBJ, slot, ID);
                 break;
             case _skinCategories.head_accesories:
-                ChangingHeadAccesories(slot, ID);
+                ChangingHeadAccesories(ref O_currObj, ref C_currOBJ, slot, ID);
                 break;
         }
     }
-    public virtual void ChangingSkin(Transform rootBone, ref SkinnedMeshRenderer currSkinnedMeshRenderers, _CharID ID, _skinCategories skinCategories, GameObject[] topBody, GameObject[] bottomBody)
+    // handles changing skins that use skinnedMeshRenderer
+    //it required root bone, original skin(prefab), copy skin(instantiate), Gender, skin category to change, list of NPC top body(example: hands, torso), and list of NPC bottom body(example: hips, legs)
+    public virtual void ChangingSkin(Transform rootBone, ref SkinnedMeshRenderer O_currSkin, ref SkinnedMeshRenderer C_currSkin, _CharID ID, _skinCategories skinCategories, GameObject[] topBody, GameObject[] bottomBody)
     {
         switch(skinCategories)
         {
-            
             case _skinCategories.top:
-                ChangingTop(rootBone, ref currSkinnedMeshRenderers, ID, false, topBody);
+                ChangingTop(rootBone, ref O_currSkin, ref C_currSkin, ID, false, topBody);
                 break;
             case _skinCategories.bottom:
-                ChangingBottom(rootBone, ref currSkinnedMeshRenderers, ID, false, bottomBody);
+                ChangingBottom(rootBone, ref O_currSkin, ref C_currSkin, ID, false, bottomBody);
                 break;
             case _skinCategories.shoes:
-                ChangingShoes(rootBone, ref currSkinnedMeshRenderers, ID, false);
+                ChangingShoes(rootBone, ref O_currSkin, ref C_currSkin, ID, false);
                 break;
             case _skinCategories.top_accesories:
-                ChangingTopAccesories(rootBone, ref currSkinnedMeshRenderers, ID, false);
+                ChangingTopAccesories(rootBone, ref O_currSkin, ref C_currSkin, ID, false);
                 break;
             case _skinCategories.preset:
-                ChangingOutfitPreset();
+                ChangingOutfitPreset(rootBone, ref O_currSkin, ref C_currSkin, ID, false, topBody, bottomBody);
                 break;
-
         }
     }
 
     
-    
-    public virtual void ChangingTop(Transform rootBone, ref SkinnedMeshRenderer currSkin, _CharID ID, bool random, GameObject[] topBody)
+    //changing the top clothes
+    public virtual void ChangingTop(Transform rootBone, ref SkinnedMeshRenderer O_currSkin, ref SkinnedMeshRenderer C_currSkin, _CharID ID, bool random, GameObject[] topBody)
     {
-        SkinnedMeshRenderer tempSkin;
-        SkinnedMeshRenderer original;
+        SkinnedMeshRenderer originalSkinToChange;
+        SkinnedMeshRenderer copySkinToInstantiate;
         int indexNum;
+        int otherIndexNum;
         if (!random)
         {
             if (ID == _CharID.female)
             {
-                
-                tempSkin = Instantiate(Changing(currSkin, F_Top_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
-                tempSkin.bones = currSkin.bones;
-                tempSkin.rootBone = rootBone;
-                original = F_Top_prefabSkinnedMeshRenderers[indexNum];
+                originalSkinToChange = Changing(O_currSkin, F_Top_prefabSkinnedMeshRenderers, out indexNum);
+                if (!C_currSkin.GetComponentInParent<NPC>().C_presetSkinMeshRenderer.gameObject.activeSelf)
+                {
+                    EnablingBodyParts(F_topBody, topBody, indexNum);
+                }
+                else
+                {
+                    C_currSkin.transform.parent.gameObject.SetActive(true);
+                    SkinnedMeshRenderer tempSkin = C_currSkin.GetComponentInParent<NPC>().C_presetSkinMeshRenderer;
+                    tempSkin.gameObject.SetActive(false);
+                    tempSkin.transform.parent.gameObject.SetActive(false);
 
-                Destroy(currSkin.gameObject);
-                currSkin = original;
-                //EnablingBodyParts(topBody, CheckWhatIndex(currSkin, F_Top_prefabSkinnedMeshRenderers));
+                    otherIndexNum = CheckWhatIndex(GM.currNPC.O_bottomSkinMeshRenderer, F_Bot_prefabSkinnedMeshRenderers);
+                    EnablingBodyParts(F_bottomBody, GM.currNPC.bottomBody, otherIndexNum);
+                    EnablingBodyParts(F_topBody, topBody, indexNum);
 
+                }
             }
             else
             {
-                tempSkin = Instantiate(Changing(currSkin, M_Top_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
-                tempSkin.bones = currSkin.bones;
-                tempSkin.rootBone = rootBone;
-                original = F_Top_prefabSkinnedMeshRenderers[indexNum];
+                originalSkinToChange = Changing(O_currSkin, M_Top_prefabSkinnedMeshRenderers, out indexNum);
+                if (C_currSkin.GetComponentInParent<NPC>().C_presetSkinMeshRenderer.gameObject.activeSelf)
+                {
+                    EnablingBodyParts(M_topBody, topBody, indexNum);
+                }
+                else
+                {
+                    C_currSkin.transform.parent.gameObject.SetActive(true);
+                    SkinnedMeshRenderer tempSkin = C_currSkin.GetComponentInParent<NPC>().C_presetSkinMeshRenderer;
+                    tempSkin.gameObject.SetActive(false);
+                    tempSkin.transform.parent.gameObject.SetActive(false);
 
-                Destroy(currSkin.gameObject);
-                currSkin = original;
-                //EnablingBodyParts(topBody, CheckWhatIndex(currSkin, M_Top_prefabSkinnedMeshRenderers));
+                    otherIndexNum = CheckWhatIndex(GM.currNPC.O_bottomSkinMeshRenderer, M_Bot_prefabSkinnedMeshRenderers);
+                    EnablingBodyParts(M_bottomBody, GM.currNPC.bottomBody, otherIndexNum);
+                    EnablingBodyParts(M_topBody, topBody, indexNum);
 
-
+                }
             }
         }
         else
         {
             if (ID == _CharID.female)
             {
-                tempSkin = Instantiate(ChangingRandom(currSkin, F_Top_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
-                tempSkin.bones = currSkin.bones;
-                tempSkin.rootBone = rootBone;
-                //EnablingBodyParts(topBody, CheckWhatIndex(currSkin, F_Top_prefabSkinnedMeshRenderers));
-
-                Destroy(currSkin.gameObject);
-                currSkin = M_Top_prefabSkinnedMeshRenderers[indexNum];
-
+                originalSkinToChange = ChangingRandom(F_Top_prefabSkinnedMeshRenderers, out indexNum);
+                EnablingBodyParts(F_topBody, topBody, indexNum);
             }
             else
             {
-                tempSkin = Instantiate(ChangingRandom(currSkin, M_Top_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
-                tempSkin.bones = currSkin.bones;
-                tempSkin.rootBone = rootBone;
-                //EnablingBodyParts(topBody, CheckWhatIndex(currSkin, M_Top_prefabSkinnedMeshRenderers));
-
-                Destroy(currSkin.gameObject);
-                currSkin = M_Top_prefabSkinnedMeshRenderers[indexNum];
-
+                originalSkinToChange = ChangingRandom(M_Top_prefabSkinnedMeshRenderers, out indexNum);
+                EnablingBodyParts(M_topBody, topBody, indexNum);
             }
-
         }
 
+        copySkinToInstantiate = Instantiate(originalSkinToChange, C_currSkin.transform.parent);
+        copySkinToInstantiate.bones = C_currSkin.bones;
+        copySkinToInstantiate.rootBone = rootBone;
+
+        if (C_currSkin != null)
+        {
+            Destroy(C_currSkin.gameObject);
+        }
+
+        O_currSkin = originalSkinToChange;
+        C_currSkin = copySkinToInstantiate;
 
     }
 
-    public virtual void ChangingBottom(Transform rootBone, ref SkinnedMeshRenderer currSkin, _CharID ID, bool random, GameObject[] bottomBody)
+    //changing the bottom clothes
+    public virtual void ChangingBottom(Transform rootBone, ref SkinnedMeshRenderer O_currSkin, ref SkinnedMeshRenderer C_currSkin, _CharID ID, bool random, GameObject[] bottomBody)
     {
-        SkinnedMeshRenderer tempSkin;
+        SkinnedMeshRenderer originalSkinToChange;
+        SkinnedMeshRenderer copySkinToInstantiate;
         int indexNum;
+        int otherIndexNum;
         if (!random)
         {
             if (ID == _CharID.female)
             {
-                tempSkin = Instantiate(Changing(currSkin, F_Bot_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
-                tempSkin.bones = currSkin.bones;
-                tempSkin.rootBone = rootBone;
+                originalSkinToChange = Changing(O_currSkin, F_Bot_prefabSkinnedMeshRenderers, out indexNum);
+                if (!C_currSkin.GetComponentInParent<NPC>().C_presetSkinMeshRenderer.gameObject.activeSelf)
+                {
+                    EnablingBodyParts(F_bottomBody, bottomBody, indexNum);
+                }
+                else
+                {
+                    C_currSkin.transform.parent.gameObject.SetActive(true);
+                    SkinnedMeshRenderer tempSkin = C_currSkin.GetComponentInParent<NPC>().C_presetSkinMeshRenderer;
+                    tempSkin.gameObject.SetActive(false);
+                    tempSkin.transform.parent.gameObject.SetActive(false);
 
-                Destroy(currSkin.gameObject);
-                currSkin = F_Bot_prefabSkinnedMeshRenderers[indexNum];
-                //EnablingBodyParts(bottomBody, CheckWhatIndex(currSkin, F_Bot_prefabSkinnedMeshRenderers));
-
-
+                    otherIndexNum = CheckWhatIndex(GM.currNPC.O_topSkinMeshRenderer, F_Top_prefabSkinnedMeshRenderers);
+                    EnablingBodyParts(F_topBody, GM.currNPC.topBody, otherIndexNum);
+                    EnablingBodyParts(F_bottomBody, bottomBody, indexNum);
+                }
             }
             else
             {
-                tempSkin = Instantiate(Changing(currSkin, M_Bot_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
-                tempSkin.bones = currSkin.bones;
-                tempSkin.rootBone = rootBone;
+                originalSkinToChange = Changing(O_currSkin, M_Bot_prefabSkinnedMeshRenderers, out indexNum);
+                if (!C_currSkin.GetComponentInParent<NPC>().C_presetSkinMeshRenderer.gameObject.activeSelf)
+                {
+                    EnablingBodyParts(M_bottomBody, bottomBody, indexNum);
+                }
+                else
+                {
+                    C_currSkin.transform.parent.gameObject.SetActive(true);
+                    SkinnedMeshRenderer tempSkin = C_currSkin.GetComponentInParent<NPC>().C_presetSkinMeshRenderer;
+                    tempSkin.gameObject.SetActive(false);
+                    tempSkin.transform.parent.gameObject.SetActive(false);
 
-                Destroy(currSkin.gameObject);
-                currSkin = M_Bot_prefabSkinnedMeshRenderers[indexNum];
-                //EnablingBodyParts(bottomBody, CheckWhatIndex(currSkin, M_Bot_prefabSkinnedMeshRenderers));
-
+                    otherIndexNum = CheckWhatIndex(GM.currNPC.O_topSkinMeshRenderer, M_Top_prefabSkinnedMeshRenderers);
+                    EnablingBodyParts(M_topBody, GM.currNPC.topBody, otherIndexNum);
+                    EnablingBodyParts(M_bottomBody, bottomBody, indexNum);
+                }
             }
         }
         else
         {
             if (ID == _CharID.female)
             {
-                tempSkin = Instantiate(ChangingRandom(currSkin, F_Bot_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
-                tempSkin.bones = currSkin.bones;
-                tempSkin.rootBone = rootBone;
-
-                Destroy(currSkin.gameObject);
-                currSkin = M_Bot_prefabSkinnedMeshRenderers[indexNum];
+                originalSkinToChange = ChangingRandom(F_Bot_prefabSkinnedMeshRenderers, out indexNum);
+                EnablingBodyParts(F_bottomBody, bottomBody, indexNum);
 
             }
             else
             {
-                tempSkin = Instantiate(ChangingRandom(currSkin, M_Bot_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
-                tempSkin.bones = currSkin.bones;
-                tempSkin.rootBone = rootBone;
-
-                Destroy(currSkin.gameObject);
-                currSkin = M_Bot_prefabSkinnedMeshRenderers[indexNum];
+                originalSkinToChange = ChangingRandom(M_Bot_prefabSkinnedMeshRenderers, out indexNum);
+                EnablingBodyParts(M_bottomBody, bottomBody, indexNum);
 
             }
-
         }
+
+        copySkinToInstantiate = Instantiate(originalSkinToChange, C_currSkin.transform.parent);
+        copySkinToInstantiate.bones = C_currSkin.bones;
+        copySkinToInstantiate.rootBone = rootBone;
+
+
+        if (C_currSkin != null)
+        {
+            Destroy(C_currSkin.gameObject);
+        }
+
+        O_currSkin = originalSkinToChange;
+        C_currSkin = copySkinToInstantiate;
     }
 
-    public virtual void ChangingShoes(Transform rootBone, ref SkinnedMeshRenderer currSkin, _CharID ID, bool random)
+    //changing the shoes
+    public virtual void ChangingShoes(Transform rootBone, ref SkinnedMeshRenderer O_currSkin, ref SkinnedMeshRenderer C_currSkin, _CharID ID, bool random)
     {
-        SkinnedMeshRenderer tempSkin;
+        SkinnedMeshRenderer originalSkinToChange;
+        SkinnedMeshRenderer copySkinToInstantiate;
         int indexNum;
         if (!random)
         {
             if (ID == _CharID.female)
             {
-                tempSkin = Instantiate(Changing(currSkin, F_Shoes_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
-                tempSkin.bones = currSkin.bones;
-                tempSkin.rootBone = rootBone;
-
-                Destroy(currSkin.gameObject);
-                currSkin = F_Shoes_prefabSkinnedMeshRenderers[indexNum];
-
+                originalSkinToChange = Changing(O_currSkin, F_Shoes_prefabSkinnedMeshRenderers, out indexNum);
             }
             else
             {
-                tempSkin = Instantiate(Changing(currSkin, M_Shoes_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
-                tempSkin.bones = currSkin.bones;
-                tempSkin.rootBone = rootBone;
-
-                Destroy(currSkin.gameObject);
-                currSkin = M_Shoes_prefabSkinnedMeshRenderers[indexNum];
-
+                originalSkinToChange = Changing(O_currSkin, M_Shoes_prefabSkinnedMeshRenderers, out indexNum);
             }
         }
         else
         {
             if (ID == _CharID.female)
             {
-                tempSkin = Instantiate(ChangingRandom(currSkin, F_Shoes_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
-                tempSkin.bones = currSkin.bones;
-                tempSkin.rootBone = rootBone;
-
-                Destroy(currSkin.gameObject);
-                currSkin = F_Shoes_prefabSkinnedMeshRenderers[indexNum];
-
+                originalSkinToChange = ChangingRandom(F_Shoes_prefabSkinnedMeshRenderers, out indexNum);
             }
             else
             {
-                tempSkin = Instantiate(ChangingRandom(currSkin, M_Shoes_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
-                tempSkin.bones = currSkin.bones;
-                tempSkin.rootBone = rootBone;
-
-                Destroy(currSkin.gameObject);
-                currSkin = M_Shoes_prefabSkinnedMeshRenderers[indexNum];
-
+                originalSkinToChange = ChangingRandom(M_Shoes_prefabSkinnedMeshRenderers, out indexNum);
             }
-
         }
+
+        copySkinToInstantiate = Instantiate(originalSkinToChange, C_currSkin.transform.parent);
+        copySkinToInstantiate.bones = C_currSkin.bones;
+        copySkinToInstantiate.rootBone = rootBone;
+
+        if (C_currSkin != null)
+        {
+            Destroy(C_currSkin.gameObject);
+        }
+
+        O_currSkin = originalSkinToChange;
+        C_currSkin = copySkinToInstantiate;
     }
 
-    public virtual void ChangingTopAccesories(Transform rootBone, ref SkinnedMeshRenderer currSkin, _CharID ID, bool random)
+    //changing the top accesories(example: shawl)
+    public virtual void ChangingTopAccesories(Transform rootBone, ref SkinnedMeshRenderer O_currSkin, ref SkinnedMeshRenderer C_currSkin, _CharID ID, bool random)
     {
-        SkinnedMeshRenderer tempSkin;
+        SkinnedMeshRenderer originalSkinToChange;
+        SkinnedMeshRenderer copySkinToInstantiate;
         int indexNum;
         if (!random)
         {
             if (ID == _CharID.female)
             {
-                tempSkin = Instantiate(Changing(currSkin, F_TopAccesorry_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
-                tempSkin.bones = currSkin.bones;
-                tempSkin.rootBone = rootBone;
-
-                Destroy(currSkin.gameObject);
-                currSkin = F_TopAccesorry_prefabSkinnedMeshRenderers[indexNum];
-
+                originalSkinToChange = Changing(O_currSkin, F_TopAccesorry_prefabSkinnedMeshRenderers, out indexNum);
             }
             else
             {
-                tempSkin = Instantiate(Changing(currSkin, M_TopAccesorry_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
-                tempSkin.bones = currSkin.bones;
-                tempSkin.rootBone = rootBone;
-
-                Destroy(currSkin.gameObject);
-                currSkin = M_TopAccesorry_prefabSkinnedMeshRenderers[indexNum];
-
+                originalSkinToChange = Changing(O_currSkin, M_TopAccesorry_prefabSkinnedMeshRenderers, out indexNum);
             }
         }
         else
         {
             if (ID == _CharID.female)
             {
-                tempSkin = Instantiate(ChangingRandom(currSkin, F_TopAccesorry_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
-                tempSkin.bones = currSkin.bones;
-                tempSkin.rootBone = rootBone;
-
-                Destroy(currSkin.gameObject);
-                currSkin = F_TopAccesorry_prefabSkinnedMeshRenderers[indexNum];
-
+                originalSkinToChange = ChangingRandom(F_TopAccesorry_prefabSkinnedMeshRenderers, out indexNum);
             }
             else
             {
-                tempSkin = Instantiate(ChangingRandom(currSkin, M_TopAccesorry_prefabSkinnedMeshRenderers, out indexNum), currSkin.transform.parent);
-                tempSkin.bones = currSkin.bones;
-                tempSkin.rootBone = rootBone;
-
-                Destroy(currSkin.gameObject);
-                currSkin = M_TopAccesorry_prefabSkinnedMeshRenderers[indexNum];
-
+                originalSkinToChange = ChangingRandom(M_TopAccesorry_prefabSkinnedMeshRenderers, out indexNum);
             }
-
         }
+
+        copySkinToInstantiate = Instantiate(originalSkinToChange, C_currSkin.transform.parent);
+        copySkinToInstantiate.bones = C_currSkin.bones;
+        copySkinToInstantiate.rootBone = rootBone;
+
+        if (C_currSkin != null)
+        {
+            Destroy(C_currSkin.gameObject);
+        }
+
+        O_currSkin = originalSkinToChange;
+        C_currSkin = copySkinToInstantiate;
     }
 
-    public virtual void ChangingHeadAccesories(Transform slot, _CharID ID)
+    //changing the head accesories(example: helmet, glasses)
+    public virtual void ChangingHeadAccesories(ref GameObject O_currObj, ref GameObject C_currOBJ, Transform slot, _CharID ID)
     {
         GameObject accesories;
+        GameObject tempObj;
+        GameObject hairSlot = slot.GetComponentInParent<NPC>().headSlot.gameObject;
+        int indexNum;
         if (CheckIfHasSkin(slot))
         {
-            accesories = slot.GetChild(0).gameObject;
+            tempObj = slot.transform.GetChild(0).gameObject;
             if (ID == _CharID.female)
             {
-                Instantiate(Changing(accesories, F_HeadAccesorry_prefab), slot);
+                accesories = Changing(O_currObj, F_HeadAccesorry_prefab, out indexNum);
+                O_currObj = accesories;
+                C_currOBJ = Instantiate(O_currObj, slot);
             }
             else
             {
-                Instantiate(Changing(accesories, M_HeadAccesorry_prefab), slot);
+                accesories = Changing(O_currObj, M_HeadAccesorry_prefab, out indexNum);
+                O_currObj = accesories;
+                C_currOBJ = Instantiate(O_currObj, slot);
             }
+            Destroy(tempObj);
         }
         else
         {
             if (ID == _CharID.female)
             {
-                accesories = F_HeadAccesorry_prefab[0];
-                Instantiate(accesories, slot);
+                indexNum = UnityEngine.Random.Range(0, F_HeadAccesorry_prefab.Length - 1);
+
+                accesories = F_HeadAccesorry_prefab[indexNum];
+                O_currObj = accesories;
+                C_currOBJ = Instantiate(accesories, slot);
             }
             else
             {
-                accesories = M_HeadAccesorry_prefab[0];
-                Instantiate(accesories, slot);
+                indexNum = UnityEngine.Random.Range(0, F_HeadAccesorry_prefab.Length - 1);
+                accesories = M_HeadAccesorry_prefab[indexNum];
+                O_currObj = accesories;
+                C_currOBJ = Instantiate(accesories, slot);
             }
         }
-    }
 
-    
-
-    public virtual void ChangingHair(Transform slot, _CharID ID)
-    {
-        GameObject hair;
-        if(CheckIfHasSkin(slot))
+        if (hairSlot.transform.childCount > 0)
         {
-            hair = slot.GetChild(0).gameObject;
             if(ID == _CharID.female)
             {
-                Instantiate(Changing(hair, F_HeadAccesorry_prefab), slot);
+                hairSlot.SetActive(F_hair[indexNum].partsToEnabled[0]);
             }
             else
             {
-                Instantiate(Changing(hair, M_HeadAccesorry_prefab), slot);
+                hairSlot.SetActive(M_hair[indexNum].partsToEnabled[0]);
             }
+        }
+
+    }
+
+
+    //changing the hair
+    public virtual void ChangingHair(ref GameObject O_currObj, ref GameObject C_currOBJ, Transform slot, _CharID ID)
+    {
+        GameObject hair;
+        GameObject tempObj;
+        int indexNum;
+        if (CheckIfHasSkin(slot))
+        {
+            tempObj = slot.transform.GetChild(0).gameObject;
+            if (ID == _CharID.female)
+            {
+                hair = Changing(O_currObj, F_Head_prefab, out indexNum);
+                O_currObj = hair;
+                C_currOBJ = Instantiate(O_currObj, slot);
+            }
+            else
+            {
+                hair = Changing(O_currObj, M_Head_prefab, out indexNum);
+                O_currObj = hair;
+                C_currOBJ = Instantiate(O_currObj, slot);
+            }
+            Destroy(tempObj);
         }
         else
         {
             if (ID == _CharID.female)
             {
                 hair = F_Head_prefab[UnityEngine.Random.Range(0, F_Head_prefab.Length-1)];
-                Instantiate(hair, slot);
+                O_currObj = hair;
+                C_currOBJ = Instantiate(hair, slot);
             }
             else
             {
                 hair = M_Head_prefab[UnityEngine.Random.Range(0, M_Head_prefab.Length-1)];
-                Instantiate(hair, slot);
+                O_currObj = hair;
+                C_currOBJ = Instantiate(hair, slot);
             }
         }
     }
 
-    public virtual void ChangingOutfitPreset()
+    //changing the preset outfit that has been made
+    //if player change the preset, player cannot see all other categories of outfit
+    //this is also true for vice versa
+    public virtual void ChangingOutfitPreset(Transform rootBone, ref SkinnedMeshRenderer O_currSkin, ref SkinnedMeshRenderer C_currSkin, _CharID ID, bool random, GameObject[] topBody, GameObject[] bottomBody)
     {
+        SkinnedMeshRenderer originalSkinToChange;
+        SkinnedMeshRenderer copySkinToInstantiate;
+        int indexNum;
+        if (!random)
+        {
+            if (ID == _CharID.female)
+            {
+                originalSkinToChange = Changing(O_currSkin, F_Preset_prefabSkinnedMeshRenderers, out indexNum);
+                EnablingBodyParts(F_presetTopBody, topBody, indexNum);
+                EnablingBodyParts(F_presetBottomBody, bottomBody, indexNum);
 
+            }
+            else
+            {
+                originalSkinToChange = Changing(O_currSkin, M_Preset_prefabSkinnedMeshRenderers, out indexNum);
+                EnablingBodyParts(M_presetTopBody, topBody, indexNum);
+                EnablingBodyParts(M_presetBottomBody, bottomBody, indexNum);
+
+            }
+        }
+        else
+        {
+            if (ID == _CharID.female)
+            {
+                originalSkinToChange = ChangingRandom(F_Preset_prefabSkinnedMeshRenderers, out indexNum);
+                EnablingBodyParts(F_presetTopBody, topBody, indexNum);
+                EnablingBodyParts(F_presetBottomBody, bottomBody, indexNum);
+
+            }
+            else
+            {
+                originalSkinToChange = ChangingRandom(M_Preset_prefabSkinnedMeshRenderers, out indexNum);
+                EnablingBodyParts(M_presetTopBody, topBody, indexNum);
+                EnablingBodyParts(M_presetBottomBody, bottomBody, indexNum);
+
+            }
+        }
+
+        copySkinToInstantiate = Instantiate(originalSkinToChange, C_currSkin.transform.parent);
+        copySkinToInstantiate.bones = C_currSkin.bones;
+        copySkinToInstantiate.rootBone = rootBone;
+        copySkinToInstantiate.gameObject.SetActive(true);
+
+        if(copySkinToInstantiate.transform.childCount > 0)
+        {
+            SkinnedMeshRenderer child = copySkinToInstantiate.transform.GetChild(0).GetComponent<SkinnedMeshRenderer>();
+            child.bones = C_currSkin.bones;
+            child.rootBone = rootBone;
+        }
+
+
+
+        C_currSkin.transform.parent.parent.GetChild(1).gameObject.SetActive(false);
+        C_currSkin.transform.parent.gameObject.SetActive(true);
+
+        if (C_currSkin != null)
+        {
+            Destroy(C_currSkin.gameObject);
+        }
+
+        O_currSkin = originalSkinToChange;
+        C_currSkin = copySkinToInstantiate;
     }
 
+    //cheking if has skin inside the head slot
     public virtual bool CheckIfHasSkin(Transform slot)
     {
         if (slot.childCount > 0)
@@ -384,6 +512,8 @@ public class ChangingSkins : MonoBehaviour
         return false;
     }
 
+    //checking what skin index are we at right now for skinnedMeshRenderers
+    //example: top, bottom, shoes
     public virtual int CheckWhatIndex(SkinnedMeshRenderer currSkin, SkinnedMeshRenderer[] list)
     {
 
@@ -397,6 +527,8 @@ public class ChangingSkins : MonoBehaviour
         return -1;
     }
 
+    //checking what skin index are we at right now for game objects
+    //example: hair, head accesories
     public virtual int CheckWhatIndex(GameObject currSkin, GameObject[] list)
     {
         for (int i = 0; i < list.Length; i++)
@@ -409,7 +541,8 @@ public class ChangingSkins : MonoBehaviour
         return -1;
     }
 
-    public virtual SkinnedMeshRenderer ChangingRandom(SkinnedMeshRenderer currSkin, SkinnedMeshRenderer[] list, out int num)
+    //changing the skin that use SkinnedMeshRenderer at random
+    public virtual SkinnedMeshRenderer ChangingRandom(SkinnedMeshRenderer[] list, out int num)
     {
         
         int idx;
@@ -420,37 +553,64 @@ public class ChangingSkins : MonoBehaviour
         return list[idx];
     }
 
+    //changing the skin that use SkinnedMeshRenderer by cycling through the index
     public virtual SkinnedMeshRenderer Changing(SkinnedMeshRenderer currSkin, SkinnedMeshRenderer[] list, out int num)
     {
         int idx;
         idx = CheckWhatIndex(currSkin, list);
 
-        idx++;
-        idx = idx % list.Length;
+        if(GM.order == _changeOrder.next)
+        {
+            idx++;
+            idx = idx % list.Length;
+        }
+        else
+        {
+            idx--;
+            if(idx < 0)
+            {
+                idx = list.Length - 1;
+            }
+        }
 
         num = idx;
 
         return list[idx];
     }
 
-    public virtual GameObject Changing(GameObject obj, GameObject[] list)
+    //changing the skin that use GameObject by cycling through the index
+    public virtual GameObject Changing(GameObject obj, GameObject[] list, out int num)
     {
         int idx;
         idx = CheckWhatIndex(obj, list);
-        Destroy(obj);
 
-        idx++;
-        idx = idx % list.Length;
+        if (GM.order == _changeOrder.next)
+        {
+            idx++;
+            idx = idx % list.Length;
+        }
+        else
+        {
+            idx--;
+            if (idx < 0)
+            {
+                idx = list.Length - 1;
+            }
+        }
+
+        num = idx;
 
         return list[idx];
     }
 
-    public virtual void EnablingBodyParts(GameObject[] bodyParts, int idx)
+    //enabling body parts based on the skin that the player use (example: enabling torso if needed, legs if needed)
+    //if the body parts is not needed, then the code will made the part disabled
+    public virtual void EnablingBodyParts(List<BodyToEnabled> list, GameObject[] bodyParts, int idx)
     {
 
         for (int i = 0; i < bodyParts.Length; i++)
         {
-            bodyParts[i].gameObject.SetActive(F_topBody[idx].partsToEnabled[i]);
+            bodyParts[i].gameObject.SetActive(list[idx].partsToEnabled[i]);
         }
     }
 }
