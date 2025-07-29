@@ -38,3 +38,7 @@ i think both of that method for reducing drawcall is the best aproach in this sc
 as for Code optimization, i think the best way is to reduce the amount of memory that it reduce the CPU's work load<br><br>
 2. i will create a pipeline for designers to be able to add more categories easily for example: adding wings, or adding weapons.
 because i only made so that the designers can add more parts inside the existing categories exaple: adding more clothes, adding more pants
+
+<h2>commit hystory</h2>
+<img width="386" height="614" alt="image" src="https://github.com/user-attachments/assets/4e767fdc-4c65-4c4a-8b73-7033fcaaf691" />
+
